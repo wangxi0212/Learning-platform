@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>非标工艺AI审批项目 - 背景与价值分析</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #165DFF;
+            --secondary: #36BFFA;
+            --success: #27AE60;
+            --warning: #F39C12;
+            --danger: #E74C3C;
+            --info: #3498DB;
+            --dark: #2C3E50;
+            --light: #F8FAFC;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e8ecf0 100%);
+            color: var(--dark);
+            line-height: 1.7;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, #0F42BA 100%);
+            color: white;
+            padding: 50px 0;
+            margin-bottom: 40px;
+            box-shadow: 0 6px 30px rgba(22, 93, 255, 0.35);
+        }
+
+        .header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .header .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            letter-spacing: 1px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+            margin-bottom: 28px;
+            border: none;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-header {
+            background: white;
+            border-bottom: 4px solid var(--primary);
+            padding: 22px 26px;
+            font-weight: 700;
+            font-size: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-header .icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(22, 93, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .card-body {
+            padding: 26px;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 28px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            border-top: 4px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .stat-box.success {
+            border-top-color: var(--success);
+        }
+
+        .stat-box.warning {
+            border-top-color: var(--warning);
+        }
+
+        .stat-box.danger {
+            border-top-color: var(--danger);
+        }
+
+        .stat-box.info {
+            border-top-color: var(--info);
+        }
+
+        .stat-value {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 8px;
+            line-height: 1.1;
+        }
+
+        .stat-box.success .stat-value {
+            color: var(--success);
+        }
+
+        .stat-box.warning .stat-value {
+            color: var(--warning);
+        }
+
+        .stat-box.danger .stat-value {
+            color: var(--danger);
+        }
+
+        .stat-box.info .stat-value {
+            color: var(--info);
+        }
+
+        .stat-label {
+            color: #64748B;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* 文字颜色增强 */
+        .text-muted {
+            color: #4A5568 !important;
+        }
+
+        .text-primary {
+            color: #165DFF !important;
+        }
+
+        .text-success {
+            color: #27AE60 !important;
+        }
+
+        .text-warning {
+            color: #F39C12 !important;
+        }
+
+        .text-info {
+            color: #3498DB !important;
+        }
+
+        .text-danger {
+            color: #E74C3C !important;
+        }
+
+        .text-white {
+            color: #FFFFFF !important;
+        }
+
+        .text-dark {
+            color: #2C3E50 !important;
+        }
+
+        .text-secondary {
+            color: #6C757D !important;
+        }
+
+        p, div, h1, h2, h3, h4, h5, h6, li, span {
+            color: #2C3E50;
+        }
+
+        .progress-bar-custom {
+            height: 30px;
+            background: #E2E8F0;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 13px;
+            transition: width 1.2s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, rgba(255,255,255,0.2) 0%, transparent 50%);
+        }
+
+        .progress-fill.primary {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .progress-fill.success {
+            background: linear-gradient(90deg, #2ECC71, var(--success));
+        }
+
+        .progress-fill.warning {
+            background: linear-gradient(90deg, #F1C40F, var(--warning));
+        }
+
+        .progress-fill.danger {
+            background: linear-gradient(90deg, #E74C3C, #C0392B);
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .status-success {
+            background: rgba(39, 174, 96, 0.15);
+            color: #27AE60;
+        }
+
+        .status-warning {
+            background: rgba(243, 156, 18, 0.15);
+            color: #D68910;
+        }
+
+        .status-danger {
+            background: rgba(231, 76, 60, 0.15);
+            color: #E74C3C;
+        }
+
+        .status-info {
+            background: rgba(52, 152, 219, 0.15);
+            color: #3498DB;
+        }
+
+        .challenge-card {
+            background: white;
+            padding: 22px;
+            margin-bottom: 18px;
+            border-radius: 14px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.06);
+            border-left: 5px solid var(--danger);
+            transition: all 0.2s ease;
+        }
+
+        .challenge-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .challenge-card.medium {
+            border-left-color: var(--warning);
+        }
+
+        .challenge-card.low {
+            border-left-color: var(--success);
+        }
+
+        .benefit-card {
+            background: linear-gradient(135deg, rgba(22, 93, 255, 0.08) 0%, rgba(54, 191, 250, 0.08) 100%);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(22, 93, 255, 0.15);
+        }
+
+        .table-modern {
+            background: white;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .table-modern thead {
+            background: linear-gradient(135deg, var(--primary), #0F42BA);
+            color: white;
+        }
+
+        .table-modern th {
+            font-weight: 700;
+            padding: 16px 20px;
+            border: none;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table-modern td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #F1F5F9;
+            vertical-align: middle;
+            font-size: 14px;
+        }
+
+        .table-modern tbody tr:hover {
+            background: rgba(22, 93, 255, 0.04);
+        }
+
+        .table-modern tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .milestone-timeline {
+            position: relative;
+            padding-left: 45px;
+        }
+
+        .milestone-timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+            border-radius: 2px;
+        }
+
+        .milestone-item {
+            position: relative;
+            margin-bottom: 28px;
+            padding: 20px 24px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .milestone-item:hover {
+            transform: translateX(8px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .milestone-item::before {
+            content: '';
+            position: absolute;
+            left: -35px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 4px solid white;
+            box-shadow: 0 0 0 4px rgba(22, 93, 255, 0.2);
+        }
+
+        .milestone-item.completed::before {
+            background: var(--success);
+            box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.2);
+        }
+
+        .milestone-item.in-progress::before {
+            background: var(--warning);
+            box-shadow: 0 0 0 4px rgba(243, 156, 18, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translateY(-50%) scale(1); }
+            50% { transform: translateY(-50%) scale(1.2); }
+        }
+
+        .milestone-item.planned::before {
+            background: #94A3B8;
+            box-shadow: 0 0 0 4px rgba(148, 163, 184, 0.2);
+        }
+
+        .feature-card {
+            background: white;
+            padding: 24px;
+            border-radius: 14px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.06);
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(22, 93, 255, 0.1), rgba(54, 191, 250, 0.1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 auto 16px;
+        }
+
+        .footer {
+            background: var(--dark);
+            color: white;
+            padding: 40px 0;
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        .footer p {
+            opacity: 0.8;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 26px;
+            }
+
+            .stat-value {
+                font-size: 36px;
+            }
+
+            .card-header {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 头部 -->
+    <div class="header">
+        <div class="container">
+            <div class="text-center">
+                <h1>非标工艺AI审批项目</h1>
+                <div class="subtitle">项目背景与价值分析报告</div>
+                <div class="mt-3">
+                    <span class="status-badge status-info">📅 报告日期：2026-06-02</span>
+                    <span class="status-badge status-warning ml-2">🟡 项目阶段：方案设计</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- 项目概述 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="icon">📋</div>
+                项目概述
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h4 class="text-primary mb-3">项目定位</h4>
+                        <p class="text-muted text-lg">
+                            聚焦用户价值，助力大家居战略落地——为商场和审批人员提供AI辅助审批工具，实现非标工艺审批<span class="text-primary font-weight-bold">数字化提效</span>。
+                        </p>
+                        
+                        <h4 class="text-primary mt-4 mb-3">核心价值主张</h4>
+                        <p class="text-muted">
+                            通过AI驱动的智能预审，将非标工艺审批从"人工驱动"转变为"数据驱动"，实现审批效率提升、标准统一、知识沉淀的三重价值。
+                        </p>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="bg-light rounded-lg p-4">
+                            <h5 class="font-weight-bold mb-3">对齐战略</h5>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span class="status-badge status-info">大家居战略</span>
+                                <span class="status-badge status-info">全案交付</span>
+                                <span class="status-badge status-info">数字化提效</span>
+                                <span class="status-badge status-info">终端赋能</span>
+                                <span class="status-badge status-info">降本增效</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 项目背景 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="icon">🎯</div>
+                项目背景
+            </div>
+            <div class="card-body">
+                <h4 class="text-primary mb-4">项目发起原因</h4>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-4">
+                        <div class="benefit-card">
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="status-badge status-danger me-3">🔴</span>
+                                <strong>审批效率低</strong>
+                            </div>
+                            <p class="text-muted text-sm">人工审批耗时长，平均审批周期超过5天，严重影响订单交付周期</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="benefit-card">
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="status-badge status-danger me-3">🔴</span>
+                                <strong>审批标准不统一</strong>
+                            </div>
+                            <p class="text-muted text-sm">不同审批人员对规则理解存在差异，导致审批结果不一致</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="benefit-card">
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="status-badge status-warning me-3">🟡</span>
+                                <strong>历史数据未充分利用</strong>
+                            </div>
+                            <p class="text-muted text-sm">近半年积累的16,402条审批记录未形成智能化复用</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="benefit-card">
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="status-badge status-warning me-3">🟡</span>
+                                <strong>商场体验待提升</strong>
+                            </div>
+                            <p class="text-muted text-sm">提交审批后等待时间长，缺乏即时反馈机制</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="text-primary mt-4 mb-4">目标受众</h4>
+                <div class="table-modern">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>用户角色</th>
+                                <th>核心特征</th>
+                                <th>核心需求</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>商场申请人</strong></td>
+                                <td>商场销售人员</td>
+                                <td>快速获得预审反馈，了解审批预期</td>
+                            </tr>
+                            <tr>
+                                <td><strong>工艺审批人员</strong></td>
+                                <td>工艺审批专员</td>
+                                <td>借助AI辅助决策，提高审批效率</td>
+                            </tr>
+                            <tr>
+                                <td><strong>非标计价人员</strong></td>
+                                <td>核价专员</td>
+                                <td>获取AI非标计价意见，辅助价格审批</td>
+                            </tr>
+                            <tr>
+                                <td><strong>系统管理员</strong></td>
+                                <td>IT运维人员</td>
+                                <td>规则配置、数据同步、系统运维</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 项目价值 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="icon">💎</div>
+                项目价值
+            </div>
+            <div class="card-body">
+                <h4 class="text-primary mb-4">预期达成的效益</h4>
+                
+                <div class="row mb-6">
+                    <div class="col-md-3 mb-4">
+                        <div class="feature-card">
+                            <div class="feature-icon">⚡</div>
+                            <h5 class="font-weight-bold text-dark">效率提升</h5>
+                            <p class="text-muted text-sm">AI预审覆盖率≥90%，审批时长缩短99%</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="feature-card">
+                            <div class="feature-icon">🎯</div>
+                            <h5 class="font-weight-bold text-dark">质量保障</h5>
+                            <p class="text-muted text-sm">审批标准统一，AI与人工一致率≥90%</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="feature-card">
+                            <div class="feature-icon">📚</div>
+                            <h5 class="font-weight-bold text-dark">知识沉淀</h5>
+                            <p class="text-muted text-sm">自动学习历史审批经验，构建企业知识库</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="feature-card">
+                            <div class="feature-icon">🚀</div>
+                            <h5 class="font-weight-bold text-dark">体验升级</h5>
+                            <p class="text-muted text-sm">即时预审反馈，商场体验显著改善</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="text-primary mb-4">对业务发展的促进作用</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="bg-light rounded-lg p-4 mb-4">
+                            <h5 class="font-weight-bold text-dark mb-2">直接业务价值</h5>
+                            <ul class="list-unstyled text-muted">
+                                <li class="mb-2">✅ <strong>订单交付周期缩短</strong>：AI预审减少人工等待时间</li>
+                                <li class="mb-2">✅ <strong>客户满意度提升</strong>：更快的审批响应带来更好体验</li>
+                                <li class="mb-2">✅ <strong>人力成本优化</strong>：减少重复劳动，释放人力资源</li>
+                                <li class="mb-2">✅ <strong>决策质量提升</strong>：基于数据的智能审批</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="bg-light rounded-lg p-4 mb-4">
+                            <h5 class="font-weight-bold text-dark mb-2">战略价值</h5>
+                            <ul class="list-unstyled text-muted">
+                                <li class="mb-2">✅ <strong>数字化转型</strong>：推动审批流程数字化</li>
+                                <li class="mb-2">✅ <strong>技术积累</strong>：建立AI能力平台</li>
+                                <li class="mb-2">✅ <strong>竞争优势</strong>：行业内率先实现审批智能化</li>
+                                <li class="mb-2">✅ <strong>数据资产</strong>：沉淀审批知识资产</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 实施路径 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="icon">🗓️</div>
+                实施路径
+            </div>
+            <div class="card-body">
+                <h4 class="text-primary mb-4">三期上线规划</h4>
+                
+                <div class="row mb-6">
+                    <div class="col-md-4">
+                        <div class="bg-primary text-white rounded-lg p-4 text-center">
+                            <div class="font-weight-bold text-lg mb-2">6.25上线</div>
+                            <div class="text-sm opacity-90">一期</div>
+                        </div>
+                        <div class="mt-3 text-center">
+                            <p class="text-muted text-sm">文本匹配预审</p>
+                            <p class="text-muted text-sm">价格预审接口</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="bg-warning text-white rounded-lg p-4 text-center">
+                            <div class="font-weight-bold text-lg mb-2">7.7上线</div>
+                            <div class="text-sm opacity-90">二期</div>
+                        </div>
+                        <div class="mt-3 text-center">
+                            <p class="text-muted text-sm">文件识别（CAD/JPG）</p>
+                            <p class="text-muted text-sm">知识调度优化</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="bg-success text-white rounded-lg p-4 text-center">
+                            <div class="font-weight-bold text-lg mb-2">8.17上线</div>
+                            <div class="text-sm opacity-90">三期</div>
+                        </div>
+                        <div class="mt-3 text-center">
+                            <p class="text-muted text-sm">知识自学习</p>
+                            <p class="text-muted text-sm">智能进化</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="text-primary mb-4">关键里程碑</h4>
+                <div class="milestone-timeline">
+                    <div class="milestone-item completed">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>PRD评审通过</strong>
+                                <p class="text-muted text-sm mt-1">需求文档定稿</p>
+                            </div>
+                            <span class="status-badge status-success">✓ 已完成</span>
+                        </div>
+                    </div>
+                    <div class="milestone-item in-progress">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>原型设计完成</strong>
+                                <p class="text-muted text-sm mt-1">界面设计稿交付</p>
+                            </div>
+                            <span class="status-badge status-warning">🔄 进行中</span>
+                        </div>
+                    </div>
+                    <div class="milestone-item planned">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>技术方案评审</strong>
+                                <p class="text-muted text-sm mt-1">技术方案文档</p>
+                            </div>
+                            <span class="status-badge status-info">📅 计划中</span>
+                        </div>
+                    </div>
+                    <div class="milestone-item planned">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>接口开发完成</strong>
+                                <p class="text-muted text-sm mt-1">数据同步接口</p>
+                            </div>
+                            <span class="status-badge status-info">📅 计划中</span>
+                        </div>
+                    </div>
+                    <div class="milestone-item planned">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>一期功能上线</strong>
+                                <p class="text-muted text-sm mt-1">正式上线运行</p>
+                            </div>
+                            <span class="status-badge status-info">📅 计划中</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 进度可视化 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="icon">📊</div>
+                进度可视化
+            </div>
+            <div class="card-body">
+                <h4 class="text-primary mb-4">功能模块进度</h4>
+                
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="font-weight-bold">需求分析</span>
+                        <span>100%</span>
+                    </div>
+                    <div class="progress-bar-custom">
+                        <div class="progress-fill success" style="width: 100%;">100%</div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="font-weight-bold">PRD编写</span>
+                        <span>100%</span>
+                    </div>
+                    <div class="progress-bar-custom">
+                        <div class="progress-fill success" style="width: 100%;">100%</div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="font-weight-bold">原型设计</span>
+                        <span>80%</span>
+                    </div>
+                    <div class="progress-bar-custom">
+                        <div class="progress-fill primary" style="width: 80%;">80%</div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="font-weight-bold">技术方案</span>
+                        <span>60%</span>
+                    </div>
+                    <div class="progress-bar-custom">
+                        <div class="progress-fill primary" style="width: 60%;">60%</div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="font-weight-bold">接口开发</span>
+                        <span>40%</span>
+                    </div>
+                    <div class="progress-bar-custom">
+                        <div class="progress-fill warning" style="width: 40%;">40%</div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="font-weight-bold">AI引擎</span>
+                        <span>30%</span>
+                    </div>
+                    <div class="progress-bar-custom">
+                        <div class="progress-fill warning" style="width: 30%;">30%</div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="font-weight-bold">开发实现</span>
+                        <span>20%</span>
+                    </div>
+                    <div class="progress-bar-custom">
+                        <div class="progress-fill warning" style="width: 20%;">20%</div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="font-weight-bold">测试验收</span>
+                        <span>0%</span>
+                    </div>
+                    <div class="progress-bar-custom">
+                        <div class="progress-fill" style="width: 0%; background: #E2E8F0; color: #94A3B8;">0%</div>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <h4 class="text-primary mb-4">成功标准</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="bg-success bg-opacity-10 rounded-lg p-4">
+                                <h5 class="font-weight-bold text-success mb-3">项目成功标志</h5>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">✅ <strong>AI预审功能稳定运行</strong>，商场使用率达到80%以上</li>
+                                    <li class="mb-2">✅ <strong>审批周期缩短</strong>，从平均5天缩短至1天以内</li>
+                                    <li class="mb-2">✅ <strong>AI意见采纳率</strong>达到70%以上</li>
+                                    <li class="mb-2">✅ <strong>知识自学习机制</strong>建立完善</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="bg-primary bg-opacity-10 rounded-lg p-4">
+                                <h5 class="font-weight-bold text-primary mb-3">关键绩效指标</h5>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span class="text-muted">AI预审覆盖率</span>
+                                    <strong class="text-primary">≥90%</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span class="text-muted">AI与人工一致率</span>
+                                    <strong class="text-primary">≥90%</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span class="text-muted">审批时长缩短</span>
+                                    <strong class="text-primary">≥50%</strong>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">系统可用性</span>
+                                    <strong class="text-primary">≥99.9%</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 成果模块 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="icon">🏆</div>
+                项目成果
+            </div>
+            <div class="card-body">
+                <h4 class="text-primary mb-4">已交付成果</h4>
+                
+                <div class="row mb-5">
+                    <div class="col-md-4 mb-4">
+                        <div class="feature-card">
+                            <div class="feature-icon">📋</div>
+                            <h5 class="font-weight-bold text-dark">需求文档</h5>
+                            <p class="text-muted text-sm mb-2">PRD V1.0 已完成</p>
+                            <span class="status-badge status-success">100%</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="feature-card">
+                            <div class="feature-icon">🎨</div>
+                            <h5 class="font-weight-bold text-dark">原型设计</h5>
+                            <p class="text-muted text-sm mb-2">特殊审批界面原型</p>
+                            <span class="status-badge status-warning">80%</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="feature-card">
+                            <div class="feature-icon">💻</div>
+                            <h5 class="font-weight-bold text-dark">技术方案</h5>
+                            <p class="text-muted text-sm mb-2">AI预审技术方案</p>
+                            <span class="status-badge status-warning">60%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="text-primary mb-4">关键成果指标</h4>
+                <div class="table-modern">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>成果类型</th>
+                                <th>成果内容</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>需求分析</strong></td>
+                                <td>完成PRD编写</td>
+                                <td><span class="status-badge status-success">✓ 已完成</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>历史数据盘点</strong></td>
+                                <td>梳理历史审批记录</td>
+                                <td><span class="status-badge status-success">✓ 已完成</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>规则引擎设计</strong></td>
+                                <td>SOP规则引擎标准话术</td>
+                                <td><span class="status-badge status-success">✓ 已完成</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>原型设计</strong></td>
+                                <td>申请内容&工艺审批界面原型</td>
+                                <td><span class="status-badge status-success">✓ 已完成</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>AI业务数据同步</strong></td>
+                                <td>VFDP系统与AI系统数据同步接口</td>
+                                <td><span class="status-badge status-warning">🔄 进行中</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>一期功能上线</strong></td>
+                                <td>AI一键预审功能正式上线</td>
+                                <td><span class="status-badge status-info">📅 计划中</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h4 class="text-primary mb-4 mt-5">成果模块集成架构</h4>
+                <div class="bg-light rounded-lg p-4">
+                    <div class="row text-center">
+                        <div class="col-md-3 mb-3">
+                            <div class="bg-white rounded p-3 shadow-sm">
+                                <div class="text-primary font-weight-bold mb-2">AI预审系统</div>
+                                <small class="text-muted">数据源</small>
+                            </div>
+                        </div>
+                        <div class="col-md-1 d-flex align-items-center justify-content-center">
+                            <div class="text-primary" style="font-size: 24px;">→</div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="bg-white rounded p-3 shadow-sm border border-primary">
+                                <div class="text-primary font-weight-bold mb-2">数据同步层</div>
+                                <small class="text-muted">每日增量同步</small>
+                            </div>
+                        </div>
+                        <div class="col-md-1 d-flex align-items-center justify-content-center">
+                            <div class="text-primary" style="font-size: 24px;">→</div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="bg-white rounded p-3 shadow-sm">
+                                <div class="text-primary font-weight-bold mb-2">成果模块</div>
+                                <small class="text-muted">展示&管理</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 后续工作计划 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="icon">📋</div>
+                后续工作计划
+            </div>
+            <div class="card-body">
+                <h4 class="text-primary mb-4">特殊工艺审批业务流程</h4>
+                <div class="bg-light rounded-lg p-4 mb-5">
+                    <div class="row text-center">
+                        <div class="col-md-2 mb-3">
+                            <div class="bg-primary text-white rounded p-3">
+                                <strong>经销商</strong>
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted">填写内容<br>发起审批</small>
+                            </div>
+                        </div>
+                        <div class="col-md-1 d-flex align-items-center justify-content-center">
+                            <div class="text-primary" style="font-size: 24px;">→</div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="bg-info text-white rounded p-3">
+                                <strong>业务</strong>
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted">提交&复核<br>补充意见</small>
+                            </div>
+                        </div>
+                        <div class="col-md-1 d-flex align-items-center justify-content-center">
+                            <div class="text-primary" style="font-size: 24px;">→</div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="bg-warning text-white rounded p-3">
+                                <strong>系统</strong>
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted">AI预审接口<br>生成审批意见</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <div class="bg-success text-white rounded p-3">
+                                <strong>AI预审</strong>
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted">拆分审批点<br>检索要素</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="text-primary mb-4">特殊工艺AI预审方案</h4>
+                
+                <!-- AI预审流程 -->
+                <div class="mb-6">
+                    <h5 class="font-weight-bold text-primary mb-4">AI预审流程</h5>
+                    <div class="bg-light rounded-lg p-5">
+                        <div class="row align-items-center justify-content-center">
+                            <!-- 输入层 -->
+                            <div class="col-md-2 mb-4 text-center">
+                                <div class="bg-primary text-white rounded-lg p-4 shadow">
+                                    <div class="font-weight-bold text-lg mb-2">输入层</div>
+                                </div>
+                                <div class="mt-3">
+                                    <p class="text-muted text-sm">申请文本</p>
+                                    <p class="text-muted text-sm">申请附件（文件解析）</p>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-1 d-flex align-items-center justify-content-center mb-4">
+                                <div class="text-primary" style="font-size: 32px;">→</div>
+                            </div>
+                            
+                            <!-- 校验审批要素 -->
+                            <div class="col-md-3 mb-4 text-center">
+                                <div class="bg-info text-white rounded-lg p-4 shadow">
+                                    <div class="font-weight-bold text-lg mb-2">校验审批要素</div>
+                                </div>
+                                <div class="mt-3">
+                                    <p class="text-muted text-sm">拆分审批点</p>
+                                    <p class="text-muted text-sm">标准审批编制</p>
+                                    <p class="text-muted text-sm">校验各审批点要素是否齐全</p>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-1 d-flex align-items-center justify-content-center mb-4">
+                                <div class="text-primary" style="font-size: 32px;">→</div>
+                            </div>
+                            
+                            <!-- 生成审批意见 -->
+                            <div class="col-md-3 mb-4 text-center">
+                                <div class="bg-warning text-white rounded-lg p-4 shadow">
+                                    <div class="font-weight-bold text-lg mb-2">生成审批意见</div>
+                                </div>
+                                <div class="mt-3">
+                                    <p class="text-muted text-sm">检索历史审批</p>
+                                    <p class="text-muted text-sm">检索标准工艺</p>
+                                    <p class="text-muted text-sm">校验&判断</p>
+                                    <p class="text-muted text-sm">生成审批意见</p>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-1 d-flex align-items-center justify-content-center mb-4">
+                                <div class="text-primary" style="font-size: 32px;">→</div>
+                            </div>
+                            
+                            <!-- 输出层 -->
+                            <div class="col-md-2 mb-4 text-center">
+                                <div class="bg-success text-white rounded-lg p-4 shadow">
+                                    <div class="font-weight-bold text-lg mb-2">输出层</div>
+                                </div>
+                                <div class="mt-3">
+                                    <p class="text-muted text-sm">AI价格接口</p>
+                                    <p class="text-muted text-sm">AI预审接口</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 知识调度 -->
+                <div class="mb-6">
+                    <h5 class="font-weight-bold text-primary mb-4">知识调度</h5>
+                    <div class="bg-light rounded-lg p-5">
+                        <div class="row align-items-center justify-content-center">
+                            <!-- 数据来源 -->
+                            <div class="col-md-3 mb-4 text-center">
+                                <div class="bg-primary text-white rounded-lg p-4 shadow">
+                                    <div class="font-weight-bold text-lg mb-2">数据来源</div>
+                                </div>
+                                <div class="mt-3">
+                                    <p class="text-muted text-sm">同步历史审批至 mysql</p>
+                                    <p class="text-muted text-sm">每日增量同步</p>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-1 d-flex align-items-center justify-content-center mb-4">
+                                <div class="text-primary" style="font-size: 32px;">→</div>
+                            </div>
+                            
+                            <!-- 数据处理 -->
+                            <div class="col-md-3 mb-4 text-center">
+                                <div class="bg-info text-white rounded-lg p-4 shadow">
+                                    <div class="font-weight-bold text-lg mb-2">数据处理</div>
+                                </div>
+                                <div class="mt-3">
+                                    <p class="text-muted text-sm">增量判断</p>
+                                    <p class="text-muted text-sm">数据处理</p>
+                                    <p class="text-muted text-sm">向量数据</p>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-1 d-flex align-items-center justify-content-center mb-4">
+                                <div class="text-primary" style="font-size: 32px;">→</div>
+                            </div>
+                            
+                            <!-- 知识库建设 -->
+                            <div class="col-md-4 mb-4 text-center">
+                                <div class="bg-warning text-white rounded-lg p-4 shadow">
+                                    <div class="font-weight-bold text-lg mb-2">知识库建设</div>
+                                </div>
+                                <div class="mt-3">
+                                    <p class="text-muted text-sm">数据处理</p>
+                                    <p class="text-muted text-sm">增量判断</p>
+                                    <p class="text-muted text-sm">检索知识库</p>
+                                    <p class="text-muted text-sm">待审批审批点</p>
+                                    <p class="text-muted text-sm">待特殊审批点</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="text-primary mb-4">知识库构成</h4>
+                <div class="row mb-5">
+                    <div class="col-md-3 mb-3">
+                        <div class="bg-danger bg-opacity-10 border border-danger rounded-lg p-4 text-center">
+                            <div class="text-danger font-weight-bold">审批点库</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="bg-danger bg-opacity-10 border border-danger rounded-lg p-4 text-center">
+                            <div class="text-danger font-weight-bold">历史审批数据</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="bg-danger bg-opacity-10 border border-danger rounded-lg p-4 text-center">
+                            <div class="text-danger font-weight-bold">标准工艺知识</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="bg-danger bg-opacity-10 border border-danger rounded-lg p-4 text-center">
+                            <div class="text-danger font-weight-bold">非标准工艺知识</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="text-primary mb-4">知识自学习</h4>
+                <div class="bg-light rounded-lg p-4">
+                    <div class="text-center mb-3">
+                        <div class="bg-secondary text-white rounded p-3 shadow">
+                            <h5 class="font-weight-bold mb-0">知识自学习流程</h5>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-dark mb-3"><strong>持续优化AI预审能力，提升审批效率与准确性</strong></p>
+                        <div class="row justify-content-center mt-4">
+                            <div class="col-md-3 mb-3">
+                                <div class="bg-primary bg-opacity-10 border border-primary rounded-lg p-3">
+                                    <div class="text-primary font-weight-bold text-sm">数据收集</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="bg-info bg-opacity-10 border border-info rounded-lg p-3">
+                                    <div class="text-info font-weight-bold text-sm">模型训练</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="bg-warning bg-opacity-10 border border-warning rounded-lg p-3">
+                                    <div class="text-warning font-weight-bold text-sm">效果评估</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="bg-success bg-opacity-10 border border-success rounded-lg p-3">
+                                    <div class="text-success font-weight-bold text-sm">持续迭代</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <div class="footer">
+        <p>汇报生成时间：2026-06-02 | 参考依据：项目进度图片</p>
+        <p class="mt-2">适用场景：项目背景说明、价值评估、资源申请 | 汇报规范：欧派家居内部规范</p>
+    </div>
+</body>
+</html>
